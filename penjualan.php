@@ -2,6 +2,20 @@
 session_start();
 include 'db.php'; // Include your database connection file
 
+// Handle Delete Sale
+if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['no_nota'])) {
+    $no_nota = $_GET['no_nota'];
+
+    try {
+        $stmt = $pdo->prepare("DELETE FROM penjualan WHERE no_nota = ?");
+        $stmt->execute([$no_nota]);
+        header("Location: penjualan.php");
+        exit;
+    } catch (PDOException $e) {
+        $error_message = "Terjadi kesalahan saat menghapus penjualan. Silakan coba lagi.";
+    }
+}
+
 // Fetch all data from the penjualan table
 try {
     $stmt = $pdo->query("SELECT no_nota, id_pelanggan, tgl_nota, nama_user FROM penjualan");
@@ -15,30 +29,49 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="Daftar Penjualan - Ralyz">
     <title>Penjualan - Ralyz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <div class="sm:mx-auto sm:w-full sm:max-w-4xl">
-            <img class="mx-auto" src="merdek.png?color=indigo&shade=600" alt="Your Company" style="height: 100px; width: 100px;">
-            <h2 class="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">Daftar Penjualan</h2>
-        </div>
-        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-4xl">
-            <!-- Navigation Bar -->
-            <nav class="flex justify-center space-x-4 mb-6">
-                <a href="#" class="text-indigo-600 hover:text-indigo-500">Home</a>
-                <a href="barang.php" class="text-indigo-600 hover:text-indigo-500">Barang</a>
-                <a href="pemasok.php" class="text-indigo-600 hover:text-indigo-500">Pemasok</a>
-                <a href="pembelian.php" class="text-indigo-600 hover:text-indigo-500">Pembelian</a>
-                <a href="penjualan.php" class="text-indigo-600 hover:text-indigo-500">Penjualan</a>
-                <a href="pengguna.php" class="text-indigo-600 hover:text-indigo-500">Pengguna</a>
-                <a href="pelanggan.php" class="text-indigo-600 hover:text-indigo-500">Pelanggan</a>
-                <a href="logout.php" class="text-indigo-600 hover:text-indigo-500">Logout</a>
-            </nav>
+<body class="bg-gray-100">
 
-            <!-- Sales Table -->
-            <h3 class="text-lg font-bold text-gray-900 mt-10">Daftar Penjualan</h3>
+    <!-- Navbar -->
+    <nav class="bg-rose-600 p-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <a href="main.php" class="flex items-center space-x-2">
+                <span class="text-white text-2xl font-bold font-serif">Ralyz</span>
+            </a>
+            <ul class="flex space-x-6 text-white">
+                <li><a href="main.php" class="hover:text-gray-300">Home</a></li>
+                <li><a href="barang.php" class="hover:text-gray-300">Barang</a></li>
+                <li><a href="pemasok.php" class="hover:text-gray-300">Pemasok</a></li>
+                <li><a href="pembelian.php" class="hover:text-gray-300">Pembelian</a></li>
+                <li><a href="penjualan.php" class="hover:text-gray-300">Penjualan</a></li>
+                <li><a href="pengguna.php" class="hover:text-gray-300">Pengguna</a></li>
+                <li><a href="pelanggan.php" class="hover:text-gray-300">Pelanggan</a></li>
+                <li><a href="logout.php">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto py-12">
+        <h2 class="text-3xl font-bold text-center text-gray-900">Daftar Penjualan</h2>
+
+        <!-- Add Sale Button -->
+        <div class="mt-10">
+            <a href="tambah_penjualan.php" class="block w-full text-center bg-blue-500 text-white px-4 py-2 rounded mb-4">Tambah Penjualan Baru</a>
+        </div>
+
+        <!-- Error Message -->
+        <?php if (isset($error_message)): ?>
+            <div class="bg-red-500 text-white px-4 py-2 rounded mt-4">
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Sales Table -->
+        <div class="mt-10">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
@@ -46,25 +79,33 @@ try {
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Pelanggan</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Nota</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama User</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     <?php foreach ($sales as $sale): ?>
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['no_nota']) ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['id_pelanggan'] ?? '-') ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['tgl_nota'] ?? '-') ?></td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['nama_user'] ?? '-') ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['id_pelanggan']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['tgl_nota']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><?= htmlspecialchars($sale['nama_user']) ?></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                <a href="edit_penjualan.php?no_nota=<?= $sale['no_nota'] ?>" class="bg-green-500 text-white px-4 py-2 rounded">Edit</a>
+                                <a href="penjualan.php?action=delete&no_nota=<?= $sale['no_nota'] ?>" class="bg-red-500 text-white px-4 py-2 rounded" onclick="return confirm('Apakah Anda yakin ingin menghapus penjualan ini?')">Hapus</a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-
-            <!-- Footer -->
-            <footer class="mt-10 text-center text-gray-500">
-                © 2024 Ralyz - Semua Hak Dilindungi.
-            </footer>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <p>&copy; 2024 Ralyz - Semua Hak Dilindungi.</p>
+        </div>
+    </footer>
+
 </body>
 </html>

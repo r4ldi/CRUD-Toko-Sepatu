@@ -10,12 +10,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id_pemasok = (int)$_POST['id_pemasok'];
 
     try {
+        // Check if supplier exists
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM pemasok WHERE id_pemasok = ?");
+        $stmt->execute([$id_pemasok]);
+        $countPemasok = $stmt->fetchColumn();
+
+        if ($countPemasok == 0) {
+            throw new Exception("Pemasok tidak ditemukan!.");
+        }
+
         $stmt = $pdo->prepare("INSERT INTO barang (merk_sepatu, jenis_sepatu, no_sepatu, stok, id_pemasok) VALUES (?, ?, ?, ?, ?)");
         $stmt->execute([$merk_sepatu, $jenis_sepatu, $no_sepatu, $stok, $id_pemasok]);
         header("Location: barang.php");
         exit;
+    } catch (Exception $e) {
+        $error_message = $e->getMessage();
     } catch (PDOException $e) {
-        die("Error adding product: " . $e->getMessage());
+        $error_message = "Error adding product: " . $e->getMessage();
     }
 }
 ?>
@@ -53,6 +64,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded">Simpan</button>
         </form>
+
+        <!-- Error Message -->
+        <?php if (isset($error_message)): ?>
+            <div class="bg-red-500 text-white px-4 py-2 rounded mt-4">
+                <?php echo $error_message; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </body>
 </html>

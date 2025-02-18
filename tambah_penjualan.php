@@ -3,37 +3,18 @@ session_start();
 include 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_pemasok = trim($_POST['id_pemasok']);
+    $no_nota = trim($_POST['no_nota']);
+    $id_pelanggan = trim($_POST['id_pelanggan']);
     $tgl_nota = trim($_POST['tgl_nota']);
     $nama_user = trim($_POST['nama_user']);
 
     try {
-        // Check if the supplier exists
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM pemasok WHERE id_pemasok = ?");
-        $stmt->execute([$id_pemasok]);
-        $countPemasok = $stmt->fetchColumn();
-
-        if ($countPemasok == 0) {
-            throw new Exception("Supplier not found.");
-        }
-
-        // Check if the user exists
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-        $stmt->execute([$nama_user]);
-        $countUser = $stmt->fetchColumn();
-
-        if ($countUser == 0) {
-            throw new Exception("User not found.");
-        }
-
-        $stmt = $pdo->prepare("INSERT INTO pembelian (id_pemasok, tgl_nota, nama_user) VALUES (?, ?, ?)");
-        $stmt->execute([$id_pemasok, $tgl_nota, $nama_user]);
-        header("Location: pembelian.php");
+        $stmt = $pdo->prepare("INSERT INTO penjualan (no_nota, id_pelanggan, tgl_nota, nama_user) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$no_nota, $id_pelanggan, $tgl_nota, $nama_user]);
+        header("Location: penjualan.php");
         exit;
-    } catch (Exception $e) {
-        $error_message = $e->getMessage();
     } catch (PDOException $e) {
-        $error_message = "Error adding purchase: " . $e->getMessage();
+        $error_message = "Terjadi kesalahan saat menambah penjualan. Silakan coba lagi.";
     }
 }
 ?>
@@ -43,15 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Tambah Pembelian</title>
+    <title>Tambah Penjualan</title>
 </head>
 <body>
     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-        <h2 class="text-center text-2xl font-bold">Tambah Pembelian Baru</h2>
-        <form action="tambah_pembelian.php" method="POST" class="mt-6 space-y-6">
+        <h2 class="text-center text-2xl font-bold">Tambah Penjualan Baru</h2>
+        <form action="tambah_penjualan.php" method="POST" class="mt-6 space-y-6">
             <div>
-                <label for="id_pemasok" class="block text-sm font-medium text-gray-700">ID Pemasok</label>
-                <input type="text" name="id_pemasok" id="id_pemasok" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <label for="no_nota" class="block text-sm font-medium text-gray-700">No Nota</label>
+                <input type="text" name="no_nota" id="no_nota" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+            <div>
+                <label for="id_pelanggan" class="block text-sm font-medium text-gray-700">ID Pelanggan</label>
+                <input type="text" name="id_pelanggan" id="id_pelanggan" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             </div>
             <div>
                 <label for="tgl_nota" class="block text-sm font-medium text-gray-700">Tanggal Nota</label>

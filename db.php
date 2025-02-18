@@ -1,11 +1,11 @@
 <?php
-$host = '127.0.0.1';
+$host = 'localhost';
 $db = 'db_tokosepatu';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+$user = 'postgres'; // Ganti dengan username PostgreSQL Anda
+$pass = '123456'; // Password PostgreSQL Anda
+$charset = 'utf8';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "pgsql:host=$host;dbname=$db";
 $options = [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

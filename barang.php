@@ -37,7 +37,7 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['id']))
     <nav class="bg-rose-600 p-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <a href="main.php" class="flex items-center space-x-2">
-                <span class="text-white text-2xl font-bold font-serif">Merdeka Basketball</span>
+                <span class="text-white text-2xl font-bold font-serif">Ralyz</span>
             </a>
             <ul class="flex space-x-6 text-white">
                 <li><a href="main.php" class="hover:text-gray-300">Home</a></li>
